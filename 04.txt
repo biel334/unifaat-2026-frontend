@@ -1,0 +1,74 @@
+================================================================================
+UNIFAAT - FRONTEND 2026.2
+Aula 04 - Navegadores Web e API
+Trabalho Final 04 - Gerenciador de Tarefas com UPDATE e DELETE
+================================================================================
+
+OBJETIVO
+--------
+Implementar as operações faltantes de um gerenciador de tarefas: atualizar
+(marcar como concluída) e deletar tarefas.
+
+O QUE VOCÊ PRECISA FAZER
+------------------------
+
+1. Marcar Tarefa como Concluída (UPDATE)
+   - Adicionar um checkbox antes do nome da tarefa
+   - Ao marcar/desmarcar, chamar a API para atualizar is_done no backend
+   - A tarefa deve aparecer com strikethrough quando concluída
+   - Implementar o handler para fazer a chamada PUT
+
+2. Deletar Tarefa (DELETE)
+   - Adicionar um botão "Excluir" ao lado de cada tarefa
+   - Confirmar antes de deletar (usar alert)
+   - Chamar a API para remover do backend
+   - Recarregar a lista automaticamente após deletar
+
+ARQUIVOS A TRABALHAR
+--------------------
+
+src/frontend/public/js/
+├── render/
+│   └── taskRender.js          ← Descomente checkbox e botão delete aqui
+├── listeners/
+│   ├── taskToggleHandler.js   ← Implementar UPDATE (checkbox)
+│   └── taskDeleteHandler.js   ← Implementar DELETE (botão)
+└── pages/
+    └── tasks.js               ← Já carrega tudo, apenas use
+
+APIS DISPONÍVEIS NO BACKEND
+---------------------------
+
+PUT /users/{idUser}/tasks/{id}
+  Body: { is_done: boolean }
+  → Marca/desmarca como concluída
+
+DELETE /users/{idUser}/tasks/{id}
+  → Deleta a tarefa
+
+REGRAS
+------
+
+✅ Use axios/fetch normalmente
+✅ Siga o padrão do projeto (js/api, js/listeners)
+✅ Recarregue a lista após atualizar/deletar
+✅ Trate erros com mensagens ao usuário
+❌ Não quebre o listar e criar (que já funcionam)
+❌ Não pode usar frameworks além do que já existe
+
+COMO ENTREGAR
+-------------
+
+Preencha o formulário com seu código no link fornecido pelo professor.
+
+Prazo: 21/09/2026T23:59:59
+
+DÚVIDAS?
+--------
+
+Revise o briefing.md e os comentários TODO no código para entender melhor
+o que fazer.
+
+================================================================================
+Desenvolvido por Luan Tavares para UNIFAAT
+================================================================================

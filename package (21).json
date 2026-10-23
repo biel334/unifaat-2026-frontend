@@ -1,0 +1,18 @@
+{
+  "name": "unifaat-2026-frontend",
+  "version": "1.0.0",
+  "description": "Frontend Unifaat 2026 - Bimestre 01",
+  "scripts": {
+    "web": "cd src && node _web.js",
+    "dev": "cd src && npm run dev",
+    "migrate": "cd src && node _command.js migrate",
+    "seed": "cd src && node _command.js seed",
+    "i": "npm --prefix src install",
+    "vite:dev": "cd src && npx vite",
+    "vite:build": "cd src && npx vite build",
+    "vite:watch": "cd src && npx vite build --watch",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  }
+}

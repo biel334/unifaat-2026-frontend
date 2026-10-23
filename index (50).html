@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aula 04 — Navegadores Web e API</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="../../../assets/slide.css">
+<link rel="stylesheet" href="../../../assets/slide-16x9.css">
+<script src="../../../assets/tema.js"></script>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar" aria-label="Miniaturas dos slides">
+  <a class="sidebar-back" href="../../../index.html">← Voltar</a>
+</aside>
+
+<div class="deck" id="deck">
+
+  <section class="slide" data-eyebrow="abertura">
+    <p class="eyebrow">Frontend · Bimestre 02</p>
+    <h1>Navegadores Web<br>e API</h1>
+    <p class="lede">Aula 04. Refinar a forma como o frontend e backend se comunicam — entendendo o navegador como ambiente de execução.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="contexto">
+    <h2>De onde chegamos até aqui</h2>
+    <p class="lede">O frontend passou a conversar de verdade com o backend via Axios — fechando o ciclo de requisição e resposta. Agora o objetivo muda: refinar a forma como as duas camadas se comunicam, se protegem e se apoiam na própria estrutura do navegador.</p>
+    <p class="payoff">Para isso, precisamos entender o navegador como um programa complexo — com memória própria, ferramentas de inspeção e mecanismos de armazenamento.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="o navegador">
+    <h2>O que é um navegador</h2>
+    <p class="body-text">Depois do próprio sistema operacional, é o programa mais complexo que um usuário comum roda no seu computador ou celular.</p>
+    <p class="body-text">Dentro dele convivem:</p>
+    <ul class="points">
+      <li><strong>Motor de renderização</strong> — transforma HTML/CSS em pixels na tela</li>
+      <li><strong>Motor de JavaScript</strong> — interpreta e executa JS</li>
+      <li><strong>Pilha de rede</strong> — fala HTTP, TLS, DNS</li>
+      <li><strong>Mecanismos de armazenamento</strong> — cookies, localStorage, sessionStorage, cache, IndexedDB</li>
+    </ul>
+    <p class="payoff">Cada aba é isolada em seu próprio processo — uma aba travando não derruba o navegador inteiro.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="window e document">
+    <h2><code>window</code> — o objeto global do frontend</h2>
+    <div class="term">
+      <div class="term-bar">
+        <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+        <span class="term-path">console.js</span>
+      </div>
+      <div class="term-body">
+        <div class="term-line comment">// document é uma propriedade de window</div>
+        <div class="term-line"><span class="prompt">→</span> <span class="cmd">window.document === document</span></div>
+        <div class="term-line out hl">true</div>
+        <div class="term-line comment">// window guarda outras informações do ambiente</div>
+        <div class="term-line"><span class="prompt">→</span> <span class="cmd">window.innerWidth, window.innerHeight</span></div>
+        <div class="term-line out"># dimensões da viewport</div>
+        <div class="term-line"><span class="prompt">→</span> <span class="cmd">window.location.href</span></div>
+        <div class="term-line out"># URL atual</div>
+      </div>
+    </div>
+    <p class="payoff">Tudo que parecia "solto" (document, console, localStorage, fetch, alert) é propriedade ou método de <code>window</code>.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="window · eventos">
+    <h2>Window também dispara eventos</h2>
+    <ul class="points">
+      <li><strong>resize</strong> — quando a janela muda de tamanho (novo width/height)</li>
+      <li><strong>scroll</strong> — quando a página é rolada (novo scrollY/scrollX)</li>
+    </ul>
+    <div class="tree" style="font-size: 1em; margin-top: 1.5em;">
+      window.<span class="hl">addEventListener</span>(<span class="accent-ink">"resize"</span>, () => {<br>
+      &nbsp;&nbsp;console.log(window.innerWidth);<br>
+      });<br><br>
+      window.<span class="hl">addEventListener</span>(<span class="accent-ink">"scroll"</span>, () => {<br>
+      &nbsp;&nbsp;console.log(window.scrollY);<br>
+      });
+    </div>
+    <p class="payoff">Eventos de window — pertencem à janela como um todo, não a elementos na árvore DOM.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="devtools">
+    <h2>DevTools — a memória do navegador exposta</h2>
+    <p class="body-text">Abre com <code>Ctrl+Shift+I</code>. Três abas principais:</p>
+    <ul class="points">
+      <li><strong>Elements</strong> — DOM em memória, alterações feitas por JS, painel de estilos renderizados (editável em tempo real)</li>
+      <li><strong>Console</strong> — exibir logs e executar JS ao vivo contra o window/document real</li>
+      <li><strong>Network</strong> — toda requisição HTTP em cascata (waterfall), com timing detalhado</li>
+    </ul>
+    <p class="payoff">O Console é uma porta de entrada viva para o ambiente de execução — muito mais poderoso que apenas ler logs.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="network · cascata">
+    <h2>Por que as requisições aparecem em cascata</h2>
+    <p class="body-text">O navegador não sabe, de antemão, todos os arquivos que vai precisar. Descobre conforme processa a resposta:</p>
+    <div class="tree" style="font-size: 0.9em; line-height: 1.6;">
+      1. Faz requisição pelo HTML<br>
+      2. Parseia HTML, construindo o DOM linha por linha<br>
+      3. Encontra tags que referenciam outros arquivos (<code>&lt;link&gt;</code>, <code>&lt;script&gt;</code>, <code>&lt;img&gt;</code>)<br>
+      4. Dispara requisição para cada asset naquele momento<br>
+      5. Cada asset pode referenciar outros (CSS importa fonte, JS chama API)
+    </div>
+    <p class="payoff">Essa descoberta progressiva forma a "cascata" visível na aba Network.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="cookies">
+    <h2>Cookies — memória para HTTP stateless</h2>
+    <p class="body-text">HTTP é stateless: cada requisição chega sem memória da anterior. Cookies resolvem isso — pequenos pedaços de dado (chave=valor) que o navegador reenvia automaticamente em toda requisição para aquele domínio.</p>
+    <p class="payoff">É assim que um site "lembra" que você está logado entre uma página e outra.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="cookies · document.cookie">
+    <h2>Lendo e escrevendo cookies</h2>
+    <div class="term">
+      <div class="term-bar">
+        <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+        <span class="term-path">console.js</span>
+      </div>
+      <div class="term-body">
+        <div class="term-line comment">// LER: retorna todos os cookies como string</div>
+        <div class="term-line"><span class="prompt">→</span> <span class="cmd">document.cookie</span></div>
+        <div class="term-line out">"tema=escuro; idioma=pt-BR"</div>
+        <div class="term-line"></div>
+        <div class="term-line comment">// ESCREVER: adiciona/atualiza cookie</div>
+        <div class="term-line"><span class="prompt">→</span> <span class="cmd">document.cookie = "tema=escuro; path=/; max-age=3600"</span></div>
+      </div>
+    </div>
+    <p class="body-text"><code>document.cookie</code> é acessado via <code>window.document.cookie</code> — fixando a hierarquia da seção anterior.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="cookies · headers">
+    <h2>Headers HTTP: Cookie e Set-Cookie</h2>
+    <p class="body-text"><strong>Requisição (frontend → backend)</strong></p>
+    <div class="tree" style="font-size: 0.85em;">
+      GET /usuarios/perfil HTTP/1.1<br>
+      Host: api.meusite.com<br>
+      <span class="hl">Cookie: sessionId=a1b2c3; tema=escuro</span>
+    </div>
+    <p class="body-text" style="margin-top: 1.5em;"><strong>Resposta (backend → frontend)</strong></p>
+    <div class="tree" style="font-size: 0.85em;">
+      HTTP/1.1 200 OK<br>
+      <span class="hl">Set-Cookie: sessionId=a1b2c3; HttpOnly; Secure; SameSite=Strict; Max-Age=3600</span><br>
+      <span class="hl">Set-Cookie: tema=escuro; Path=/</span>
+    </div>
+    <p class="payoff">O navegador automaticamente monta/atualiza o cookie — o frontend não precisa rodar nenhum código.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="cookies · atributos">
+    <h2>Max-Age, HttpOnly e Secure</h2>
+    <ul class="points">
+      <li><strong>Max-Age</strong> — em segundos, por quanto tempo o cookie continua válido antes de ser descartado automaticamente</li>
+      <li><strong>HttpOnly</strong> — torna invisível para <code>document.cookie</code>; JS não consegue ler nem escrever. Protege o cookie de XSS</li>
+      <li><strong>Secure</strong> — cookie só é enviado em conexões HTTPS, protegendo de captura em trânsito</li>
+    </ul>
+    <p class="lede">Juntos, esses três definem: por quanto tempo, quem pode acessar, e em que condições o cookie trafega.</p>
+    <p class="payoff">Qualquer cookie de autenticação em produção tem esses três.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="cookies · no axios">
+    <h2>Cookies no frontend — Axios envia automático</h2>
+    <p class="body-text">Frontend em localhost:5173. <strong>Mesmo domínio (localhost:3000)</strong> — navegador já envia o cookie automaticamente:</p>
+    <div class="tree" style="font-size: 1em;">
+      <span class="comment">// Requisição pra localhost:3000</span><br>
+      axios.<span class="hl">post</span>(<span class="accent-ink">"http://localhost:3000/usuarios"</span>, { nome: <span class="accent-ink">"Ana"</span> });<br>
+      <span class="comment">→ cookie vai automaticamente no header!</span>
+    </div>
+    <p class="body-text"><strong>Domínios diferentes (porta 8080)</strong> — precisa liberar CORS E falar ao Axios:</p>
+    <div class="tree" style="font-size: 1em;">
+      <span class="comment">// Requisição pra localhost:8080 (porta diferente!)</span><br>
+      axios.<span class="hl">post</span>(<span class="accent-ink">"http://localhost:8080/usuarios"</span>, { nome: <span class="accent-ink">"Ana"</span> }, {<br>
+      &nbsp;&nbsp;withCredentials: <span class="hl">true</span>  <span class="comment">← permite enviar cookie mesmo com CORS</span><br>
+      });<br>
+      <span class="comment">Backend precisa responder com:</span><br>
+      Access-Control-Allow-Origin: http://localhost:5173<br>
+      Access-Control-Allow-Credentials: true
+    </div>
+    <p class="payoff">Sem <code>withCredentials</code>, cookie não viaja entre portas. Com ele + CORS liberado, cookie vai normalmente.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="localStorage · breve">
+    <h2>LocalStorage e SessionStorage</h2>
+    <p class="body-text">Vistos na aba Application do DevTools — outros mecanismos de armazenamento:</p>
+    <ul class="points">
+      <li><strong>localStorage</strong> — persiste indefinidamente até ser apagado manualmente</li>
+      <li><strong>sessionStorage</strong> — dura só a sessão daquela aba</li>
+    </ul>
+    <p class="body-text">Diferença crítica: <strong>nenhum dos dois é enviado automaticamente ao backend como o cookie</strong> — ficam só no navegador, a menos que o próprio JS os leia e mande manualmente.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="jwt">
+    <h2>JWT — JSON Web Token</h2>
+    <p class="body-text">Autenticação stateless: em vez do backend guardar sessão em memória/banco, emite um token auto-contido, assinado, com dados do usuário dentro.</p>
+    <p class="lede">Estrutura: <code>header.payload.signature</code> — três partes separadas por ponto, cada uma em Base64.</p>
+    <div class="tree" style="font-size: 0.85em; word-break: break-all; margin-top: 1em;">
+      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQyLCJleHAiOjE3MzEwMDAwMDB9.4f8s9dK2p...
+    </div>
+    <p class="body-text" style="margin-top: 1em;"><strong>⚠️ IMPORTANTE:</strong> qualquer um pode ler o payload (é só Base64). <strong>Nunca coloque dados sensíveis aqui</strong> — apenas identificação (userId) e expiração (exp).</p>
+    <p class="payoff">Sem a chave secreta, ninguém consegue forjar uma signature válida — por isso o token é confiável.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="jwt · payload">
+    <h2>O payload — dados públicos legíveis</h2>
+    <div class="term">
+      <div class="term-bar">
+        <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+        <span class="term-path">backend/auth.js</span>
+      </div>
+      <div class="term-body">
+        <div class="term-line comment">// Payload simples — só o mínimo necessário</div>
+        <div class="term-line">const payload = {</div>
+        <div class="term-line">  <span class="hl">userId: 42</span></div>
+        <div class="term-line">};</div>
+        <div class="term-line"></div>
+        <div class="term-line comment">// expiresIn coloca automaticamente a data de expiração</div>
+        <div class="term-line">const token = jwt.<span class="hl">sign</span>(payload, process.env.JWT_SECRET, {</div>
+        <div class="term-line">  <span class="hl">expiresIn: "10m"  </span><span class="comment">// expira em 10 min</span></div>
+        <div class="term-line">});</div>
+      </div>
+    </div>
+    <p class="body-text" style="margin-top: 1.5em; color: #1b231e !important; font-weight: 600; font-size: 1.5rem;">Decodificando este token em <strong>jwt.io</strong> (qualquer um consegue):</p>
+    <div class="tree" style="background: #0d1a16; border: 1px solid #0a1613; padding: 12px 14px; font-size: 0.95em; overflow-x: auto; max-width: 100%; line-height: 1.3; color: #e9efe9;">
+      {<br>
+      &nbsp;&nbsp;<span class="accent-ink">"userId"</span>: 42,<br>
+      &nbsp;&nbsp;<span class="accent-ink">"iat"</span>: 1731000000,<br>
+      &nbsp;&nbsp;<span class="accent-ink">"exp"</span>: 1731000600&nbsp;&nbsp;<span class="comment">← 10 minutos depois</span><br>
+      }
+    </div>
+    <p class="payoff">Públicos, legíveis, sem nada sensível. O secret (no .env) é quem assina — só o backend consegue forjar.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="jwt · validação">
+    <h2>Validando o token — jwt.verify()</h2>
+    <div class="term">
+      <div class="term-bar">
+        <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+        <span class="term-path">backend/middleware.js</span>
+      </div>
+      <div class="term-body">
+        <div class="term-line comment">// Middleware: toda requisição passa por aqui</div>
+        <div class="term-line">export const autenticar = (req, res, next) => {</div>
+        <div class="term-line">  const token = req.cookies.<span class="hl">token</span>;</div>
+        <div class="term-line"></div>
+        <div class="term-line">  try {</div>
+        <div class="term-line">    <span class="comment">// Valida assinatura, expiração e decodifica</span></div>
+        <div class="term-line">    const decoded = jwt.<span class="hl">verify</span>(token, process.env.JWT_SECRET);</div>
+        <div class="term-line">    <span class="comment">// Se chegou aqui: token é válido e não expirou</span></div>
+        <div class="term-line">    req.usuario = { <span class="hl">id</span>: decoded.<span class="hl">userId</span> };</div>
+        <div class="term-line">    <span class="hl">next</span>();</div>
+        <div class="term-line">  } catch (erro) {</div>
+        <div class="term-line">    <span class="comment">// Token inválido, expirado ou assinatura ruim</span></div>
+        <div class="term-line">    res.status(401).json({ erro: "Não autenticado" });</div>
+        <div class="term-line">  }</div>
+        <div class="term-line">};</div>
+      </div>
+    </div>
+    <p class="payoff"><code>jwt.verify</code> faz 3 coisas: <strong>1)</strong> confere a assinatura com o secret, <strong>2)</strong> confere se expirou (exp > agora), <strong>3)</strong> decodifica. Qualquer falha = exceção.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="jwt · login completo">
+    <h2>Fluxo completo: bcrypt + JWT</h2>
+    <div class="term">
+      <div class="term-bar">
+        <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+        <span class="term-path">backend/login.js</span>
+      </div>
+      <div class="term-body">
+        <div class="term-line">app.<span class="hl">post</span>(<span class="accent-ink">"/login"</span>, async (req, res) => {</div>
+        <div class="term-line">  const { email, senha } = req.body;</div>
+        <div class="term-line"></div>
+        <div class="term-line">  <span class="comment">// 1. Busca o usuário no banco</span></div>
+        <div class="term-line">  const usuario = await db.usuarios.findOne({ email });</div>
+        <div class="term-line">  if (!usuario) return res.status(401).json(...);</div>
+        <div class="term-line"></div>
+        <div class="term-line">  <span class="comment">// 2. Compara a senha (bcrypt tem salt dentro)</span></div>
+        <div class="term-line">  const ok = await bcrypt.<span class="hl">compare</span>(senha, usuario.senhaHash);</div>
+        <div class="term-line">  if (!ok) return res.status(401).json(...);</div>
+        <div class="term-line"></div>
+        <div class="term-line">  <span class="comment">// 3. Cria JWT simples (só userId, expira em 10min)</span></div>
+        <div class="term-line">  const token = jwt.<span class="hl">sign</span>(</div>
+        <div class="term-line">    { userId: usuario.id },</div>
+        <div class="term-line">    process.env.JWT_SECRET,</div>
+        <div class="term-line">    { expiresIn: <span class="accent-ink">"10m"</span> }</div>
+        <div class="term-line">  );</div>
+        <div class="term-line"></div>
+        <div class="term-line">  <span class="comment">// 4. Devolve em cookie HttpOnly</span></div>
+        <div class="term-line">  res.cookie(<span class="accent-ink">"token"</span>, token, { httpOnly: <span class="hl">true</span>, maxAge: 600000 });</div>
+        <div class="term-line">  res.json({ msg: <span class="accent-ink">"Login ok"</span> });</div>
+        <div class="term-line">});</div>
+      </div>
+    </div>
+    <p class="payoff"><strong>bcrypt</strong> protege a senha. <strong>JWT</strong> cria a sessão sem guardar no servidor. <strong>HttpOnly</strong> protege o token de XSS.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="jwt · na prática">
+    <h2>JWT dentro de um cookie HttpOnly</h2>
+    <p class="body-text">A prática mais segura é o backend devolver o JWT dentro de um cookie HttpOnly:</p>
+    <ul class="points">
+      <li><strong>Autenticação</strong> — JWT no cookie é enviado automaticamente em toda requisição, sem frontend montar header manualmente</li>
+      <li><strong>Expiração</strong> — Max-Age do cookie e <code>exp</code> do JWT trabalham juntos</li>
+      <li><strong>Segurança</strong> — por estar em HttpOnly, o token fica protegido de roubo via <code>document.cookie</code> por XSS</li>
+    </ul>
+    <p class="payoff">Essa combinação — JWT + cookie HttpOnly + expiração — abre a porta para segurança e API contextual.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="cors">
+    <h2>CORS — o porteiro do navegador</h2>
+    <p class="body-text">Same-origin policy: é como um <strong>porteiro de clube</strong>. JS rodando em uma página só faz requisições livremente para o mesmo domínio. Se trocar protocolo, domínio OU porta — o porteiro barra.</p>
+    <div class="tree" style="font-size: 1.1em; margin: 1.5em 0;">
+      <span class="dim">Frontend (Vite)</span><br>
+      <strong>http://localhost:5173</strong><br><br>
+      <span class="dim">↓ tenta chamar ↓</span><br><br>
+      <span class="dim">Backend (Express)</span><br>
+      <strong>http://localhost:3000</strong><br><br>
+      <span class="warn">🚫 Porteiro bloqueia!</span><br>
+      <span class="dim">(mesma máquina, portas diferentes = origens diferentes)</span>
+    </div>
+  </section>
+
+  <section class="slide" data-eyebrow="cors · headers HTTP">
+    <h2>Os headers CORS — crachá VIP</h2>
+    <p class="body-text">O backend responde com headers especiais — o porteiro recebe as permissões:</p>
+    <div class="term">
+      <div class="term-bar">
+        <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+        <span class="term-path">response.http</span>
+      </div>
+      <div class="term-body">
+        <div class="term-line"><span class="cmd">HTTP/1.1 200 OK</span></div>
+        <div class="term-line"><span class="hl">Access-Control-Allow-Origin: http://localhost:5173</span></div>
+        <div class="term-line"><span class="comment">↑ qual frontend pode acessar</span></div>
+        <div class="term-line"></div>
+        <div class="term-line"><span class="hl">Access-Control-Allow-Methods: GET,POST,PUT,DELETE</span></div>
+        <div class="term-line"><span class="comment">↑ que tipos de requisição são permitidas</span></div>
+        <div class="term-line"></div>
+        <div class="term-line"><span class="hl">Access-Control-Allow-Headers: Content-Type,Authorization</span></div>
+        <div class="term-line"><span class="comment">↑ que headers o frontend pode enviar</span></div>
+        <div class="term-line"></div>
+        <div class="term-line"><span class="cmd">Content-Type: application/json</span></div>
+        <div class="term-line"><span class="out">{ "dados": "aqui vai a resposta" }</span></div>
+      </div>
+    </div>
+    <p class="payoff">Sem esses headers, resposta chega, mas o porteiro não deixa o JS ler.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="cors · no código">
+    <h2>Implementando no Express</h2>
+    <div class="term">
+      <div class="term-bar">
+        <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+        <span class="term-path">backend/server.js</span>
+      </div>
+      <div class="term-body">
+        <div class="term-line comment">// middleware CORS — roda ANTES de qualquer rota</div>
+        <div class="term-line">app.<span class="hl">use</span>((req, res, next) => {</div>
+        <div class="term-line">  res.<span class="hl">header</span>("Access-Control-Allow-Origin", <span class="accent-ink">"http://localhost:5173"</span>);</div>
+        <div class="term-line">  res.<span class="hl">header</span>("Access-Control-Allow-Methods", <span class="accent-ink">"GET,POST,PUT,DELETE"</span>);</div>
+        <div class="term-line">  res.<span class="hl">header</span>("Access-Control-Allow-Headers", <span class="accent-ink">"Content-Type,Authorization"</span>);</div>
+        <div class="term-line">  <span class="hl">next</span>();</div>
+        <div class="term-line">});</div>
+        <div class="term-line"></div>
+        <div class="term-line comment">// suas rotas vêm DEPOIS desse middleware</div>
+        <div class="term-line">app.<span class="hl">get</span>(<span class="accent-ink">"/usuarios"</span>, (req, res) => {</div>
+        <div class="term-line">  res.json({ usuarios: [{ id: 1, nome: "Ana" }] });</div>
+        <div class="term-line">});</div>
+        <div class="term-line"></div>
+        <div class="term-line">app.<span class="hl">post</span>(<span class="accent-ink">"/login"</span>, (req, res) => {</div>
+        <div class="term-line">  <span class="comment">// lógica de autenticação aqui</span></div>
+        <div class="term-line">});</div>
+      </div>
+    </div>
+    <p class="lede" style="margin-top: 1.5em;">O middleware roda em <strong>toda requisição</strong> — frontend recebe os headers, porteiro libera.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="resumo">
+    <h2>Tudo junto agora</h2>
+    <p class="body-text">O navegador como ambiente: <code>window</code> acima, <code>document</code> como propriedade, com seus próprios eventos (resize, scroll).</p>
+    <p class="body-text">A memória do navegador exposta: Elements (DOM), Console (logs + JS ao vivo), Network (cascata).</p>
+    <p class="body-text">Comunicação segura: cookies (Max-Age, HttpOnly, Secure), JWT + cookie HttpOnly, CORS.</p>
+    <p class="payoff">Base sólida para construir — agora com proteção e entendimento do próprio ambiente de execução.</p>
+  </section>
+
+  <section class="slide" data-eyebrow="trabalho final">
+    <h2>Trabalho Final 04</h2>
+    <p class="lede">Implementar UPDATE e DELETE no gerenciador de tarefas.</p>
+    <p class="body-text" style="margin-top: 2em; font-size: 1.1em;"><strong>📝&nbsp;Acesse:</strong></p>
+    <p class="body-text"><a href="https://docs.google.com/forms/d/e/1FAIpQLSfQYQpk55_9VKsyME84-QnLjedeBv_KXPD5RHBAZPxwnPnRjQ/viewform?usp=publish-editor" target="_blank" style="color: #4a9eff; text-decoration: underline;">https://docs.google.com/forms/d/e/1FAIpQLSfQYQpk55_9VKsyME84-QnLjedeBv_KXPD5RHBAZPxwnPnRjQ/viewform?usp=publish-editor</a></p>
+    <p class="body-text" style="margin-top: 2em;"><strong>⏰&nbsp;Prazo:</strong> 21/09/2026T23:59:59</p>
+  </section>
+
+  <section class="slide" data-eyebrow="fim da aula 04">
+    <h2>Navegador, window, DevTools, cookies, JWT, CORS.</h2>
+    <p class="lede">Refinar a comunicação entre frontend e backend, protegendo ambos os lados.</p>
+  </section>
+
+</div>
+
+<nav class="hud">
+  <button id="prevBtn" aria-label="Slide anterior">‹</button>
+  <div class="hud-mid">
+    <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="hud-meta">
+      <span><span id="counterCurrent">01</span> / <span id="counterTotal">23</span> — <span id="eyebrowLabel">abertura</span></span>
+      <span class="hint">use ← → ou espaço para navegar · T alterna o tema</span>
+    </div>
+  </div>
+  <button id="nextBtn" aria-label="Próximo slide">›</button>
+</nav>
+<script src="../../../assets/slide.js"></script>
+<script src="../../../assets/slide-16x9.js"></script>
+</body>
+</html>

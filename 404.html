@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>404 • Página não encontrada</title>
+    <meta name="color-scheme" content="light dark" />
+    <style>
+        :root {
+            --bg: #0b0c10;
+            --fg: #e9eef5;
+            --muted: #9aa4b2;
+            --accent: #5b9cff;
+            --card: rgba(255, 255, 255, .06);
+            --shadow: 0 10px 25px rgba(0, 0, 0, .25);
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #f6f7fb;
+                --fg: #111827;
+                --muted: #6b7280;
+                --card: #ffffff;
+                --shadow: 0 12px 24px rgba(0, 0, 0, .08);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--fg);
+            font: 16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .card {
+            width: min(680px, 100%);
+            background: var(--card);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: clamp(42px, 8vw, 72px);
+            letter-spacing: -.02em;
+        }
+
+        p {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: clamp(14px, 2.2vw, 18px);
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .center {
+            display: grid;
+            place-items: center;
+            text-align: center;
+        }
+
+        footer {
+            margin-top: 24px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        code {
+            padding: 2px 6px;
+            border-radius: 6px;
+            background: rgba(127, 127, 127, .15);
+        }
+    </style>
+</head>
+
+<body>
+    <main class="card center" role="main">
+        <h1>404</h1>
+        <p>Ops! A página que você tentou acessar não existe ou foi movida.</p>
+
+        <footer>
+            <span>Dica: no Nginx, você pode apontar <code>error_page 404 /404.html;</code></span>
+        </footer>
+    </main>
+
+</body>
+
+</html>

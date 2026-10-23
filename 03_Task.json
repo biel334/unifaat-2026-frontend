@@ -1,0 +1,272 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Task API",
+        "version": "1.0.0",
+        "description": "API de tarefas - operações CRUD para gerenciamento de tarefas por usuário"
+    },
+    "paths": {
+        "/users/{idUser}/tasks": {
+            "get": {
+                "summary": "Listar tarefas do usuário",
+                "description": "Retorna uma lista de todas as tarefas de um usuário específico",
+                "parameters": [
+                    {
+                        "name": "idUser",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "ID do usuário"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de tarefas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Task"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Criar nova tarefa",
+                "description": "Cria uma nova tarefa para um usuário específico",
+                "parameters": [
+                    {
+                        "name": "idUser",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "ID do usuário"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": "Nome da tarefa"
+                                    },
+                                    "completed": {
+                                        "type": "boolean",
+                                        "description": "Status de conclusão da tarefa",
+                                        "default": false
+                                    }
+                                },
+                                "required": [
+                                    "name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Tarefa criada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Task"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Dados inválidos"
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado"
+                    }
+                }
+            }
+        },
+        "/users/{idUser}/tasks/{id}": {
+            "get": {
+                "summary": "Obter tarefa específica",
+                "description": "Retorna os detalhes de uma tarefa específica",
+                "parameters": [
+                    {
+                        "name": "idUser",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "ID do usuário"
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "ID da tarefa"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tarefa encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Task"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tarefa ou usuário não encontrado"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Atualizar tarefa",
+                "description": "Atualiza os dados de uma tarefa específica",
+                "parameters": [
+                    {
+                        "name": "idUser",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "ID do usuário"
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "ID da tarefa"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": "Nome da tarefa"
+                                    },
+                                    "completed": {
+                                        "type": "boolean",
+                                        "description": "Status de conclusão da tarefa"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tarefa atualizada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Task"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Dados inválidos"
+                    },
+                    "404": {
+                        "description": "Tarefa ou usuário não encontrado"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Deletar tarefa",
+                "description": "Remove uma tarefa específica",
+                "parameters": [
+                    {
+                        "name": "idUser",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "ID do usuário"
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "ID da tarefa"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Tarefa deletada com sucesso"
+                    },
+                    "404": {
+                        "description": "Tarefa ou usuário não encontrado"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Task": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "ID da tarefa"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Nome da tarefa"
+                    },
+                    "completed": {
+                        "type": "boolean",
+                        "description": "Status de conclusão"
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "description": "ID do usuário proprietário da tarefa"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data de criação"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data da última atualização"
+                    }
+                }
+            }
+        }
+    }
+}
