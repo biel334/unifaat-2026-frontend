@@ -1,35 +1,18 @@
 {
-  "name": "unifaat-2026-frontend-bim01",
+  "name": "unifaat-2026-frontend",
   "version": "1.0.0",
+  "description": "Frontend Unifaat 2026 - Bimestre 01",
   "scripts": {
-    "start": "node _web.js",
-    "dev": "./node_modules/.bin/nodemon _web.js"
-  },
-  "type": "module",
-  "author": "Luan Tavares",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "@fortawesome/fontawesome-free": "^7.3.1",
-    "amqplib": "^2.2.0",
-    "axios": "^1.20.0",
-    "bcrypt": "^6.0.0",
-    "bootstrap": "^5.3.8",
-    "chalk": "^5.6.2",
-    "commander": "^15.0.0",
-    "cookie-parser": "^1.4.7",
-    "dotenv": "^17.4.2",
-    "ejs": "^7.0.1",
-    "express": "^5.2.1",
-    "express-fileupload": "^1.5.2",
-    "jsonwebtoken": "^9.0.3",
-    "pg": "^8.20.0",
-    "sequelize": "^6.37.8",
-    "swagger-ui-express": "^5.0.1"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.14",
-    "typescript": "^5.9.3",
-    "vite": "^8.2.2"
+    "web": "cd src && node _web.js",
+    "dev": "cd src && npm run dev",
+    "migrate": "cd src && node _command.js migrate",
+    "seed": "cd src && node _command.js seed",
+    "i": "npm --prefix src install",
+    "vite:dev": "cd src && npx vite",
+    "vite:build": "cd src && npx vite build",
+    "vite:watch": "cd src && npx vite build --watch",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
   }
 }
