@@ -1,0 +1,58 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  background: #f4f5f7;
+  color: #1f2937;
+}
+
+.app {
+  max-width: 480px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.task-form,
+.filter-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.task-form input {
+  flex: 1;
+  padding: 0.5rem;
+}
+
+button {
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+}
+
+.filter-bar .is-active {
+  background: #2563eb;
+  color: #fff;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+}
+
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.task-name {
+  cursor: pointer;
+}
+
+.task-name.is-done {
+  text-decoration: line-through;
+  color: #9ca3af;
+}
